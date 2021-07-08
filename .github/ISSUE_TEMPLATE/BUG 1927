@@ -1,0 +1,98 @@
+---
+name: Bug 反馈 (中文）
+about: bug
+title: '1923. 最长公共子路径'
+labels: '缺少测试用例'
+
+---
+
+**你的 LeetCode 用户名**
+梦璃夜·天星
+
+**Bug 类型**
+- [ ] 题目
+- [ ] 题解
+- [ ] 编程语言
+- [x] 缺少测试用例
+
+**描述**
+[1923. 最长公共子路径](https://leetcode-cn.com/problems/longest-common-subpath/)
+代码不完善，但是可以通过所有的测试用例
+
+**你使用的语言**
+C++
+
+**你提交或者运行的代码**
+```
+class Solution {
+public:
+    using ull = uint64_t;
+    ull b = 97755331;
+    int test(unordered_set<ull> hash, int len, vector<vector<int>>& paths){
+        ull p = 1;
+        for(int i = 1; i < len; ++i) p *= b;
+        for(auto& path: paths){
+            ull sum = 0;
+            for(int i = 0; i < len; ++i){
+                sum = sum * b + path[i];
+            }
+            if(hash.count(sum))continue;
+            int flag = 0;
+            for(int i = len; i < path.size(); ++i){
+                sum -= path[i-len]*p;
+                sum = sum * b + path[i];
+                if(hash.count(sum)){
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag)continue;
+            else return 0;
+        }
+        return 1;
+    }
+    int longestCommonSubpath(int n, vector<vector<int>>& paths) {
+        int m = paths.size();
+        vector<int>& shortest = *min_element(begin(paths), end(paths), [](vector<int>& x, vector<int>& y){return x.size() < y.size();});
+        int minlen = shortest.size();
+        
+        int l = 0, r = minlen;
+        while(l < r){
+            int m = (l+r+1)/2;
+            ull p = 1;
+            for(int i = 1; i < m; ++i) p *= b;
+            ull sum = 0;
+            unordered_set<ull> hash;
+            for(int i = 0; i < m; ++i) {
+                sum = sum * b + shortest[i];
+            }
+            hash.insert(sum);
+            for(int i = m; i < minlen; ++i){
+                sum -= shortest[i-m]*p;
+                sum = sum * b + shortest[i];
+                hash.insert(sum);
+            }
+            if(test(hash, m, paths)){
+                l = m;
+            }
+            else{
+                r = m - 1;
+            }
+        }
+        return l;
+    }
+};
+```
+
+**期望行为**
+对于输入
+5
+[[0,1,2,3,1],[2,3,4],[3,4,1,4,3]]
+
+应该输出
+1
+
+此代码实际输出
+2
+
+
